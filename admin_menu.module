@@ -207,14 +207,14 @@ function admin_menu_page_bottom(array &$page_bottom) {
     $settings['replacements'] = $replacements;
   }
 
-  if ($setting = variable_get('admin_menu_margin_top', 1)) {
+  if ($setting = \Drupal::config('admin_menu.settings')->get('margin_top')) {
     $settings['margin_top'] = $setting;
     // @todo Drupal.behaviors.adminMenuMarginTop is obsolete, but
     //   hook_page_build() does not allow to set a CSS class on the body yet.
     // @see http://drupal.org/node/1473548, http://drupal.org/node/1194528
     //$page['#attributes']['class'][] = 'admin-menu';
   }
-  if ($setting = variable_get('admin_menu_position_fixed', 1)) {
+  if ($setting = \Drupal::config('admin_menu.settings')->get('position_fixed')) {
     $settings['position_fixed'] = $setting;
 
     // TODO: does this still apply on D8?
@@ -228,14 +228,14 @@ function admin_menu_page_bottom(array &$page_bottom) {
     );
     */
   }
-  if ($setting = variable_get('admin_menu_tweak_tabs', 0)) {
+  if ($setting = \Drupal::config('admin_menu.settings')->get('tweak_tabs')) {
     $settings['tweak_tabs'] = $setting;
   }
   if ($current_path == 'admin/modules' || strpos($current_path, 'admin/modules/list') === 0) {
-    $settings['tweak_modules'] = variable_get('admin_menu_tweak_modules', 0);
+    $settings['tweak_modules'] = \Drupal::config('admin_menu.settings')->get('tweak_modules');
   }
   if ($current_path == 'admin/people/permissions' || $current_path == 'admin/people/permissions/list') {
-    $settings['tweak_permissions'] = variable_get('admin_menu_tweak_permissions', 0);
+    $settings['tweak_permissions'] = \Drupal::config('admin_menu.settings')->get('tweak_permissions');
   }
 
   $attached['drupalSettings']['admin_menu']['settings'] = $settings;
@@ -296,7 +296,7 @@ function admin_menu_js() {
 function admin_menu_cache_get($cid) {
   $cache = &drupal_static(__FUNCTION__, array());
 
-  if (!variable_get('admin_menu_cache_client', TRUE)) {
+  if (!\Drupal::config('admin_menu.settings')->get('cache_client')) {
     return FALSE;
   }
   if (!array_key_exists($cid, $cache)) {
@@ -323,7 +323,7 @@ function admin_menu_cache_get($cid) {
  *   The cache tags for the data to set.
  */
 function admin_menu_cache_set($cid, $data, array $tags) {
-  if (variable_get('admin_menu_cache_client', TRUE)) {
+  if (\Drupal::config('admin_menu.settings')->get('cache_client')) {
     cache('admin_menu')->set($cid, $data, CacheBackendInterface::CACHE_PERMANENT, $tags);
   }
 }
@@ -383,7 +383,7 @@ function admin_menu_admin_menu_replacements($complete) {
   // current counts already.
   if (!$complete) {
     // Check whether the users count component is enabled.
-    $components = variable_get('admin_menu_components', array());
+    $components = \Drupal::config('admin_menu.settings')->get('components');
     if (!empty($components['admin_menu.users']) && ($user_count = admin_menu_get_user_count())) {
       // Replace the counters in the cached menu output with current counts.
       $items['.admin-menu-users a'] = $user_count;
@@ -443,7 +443,7 @@ function admin_menu_session_count($timestamp = 0, $anonymous = TRUE) {
 function admin_menu_output($complete = FALSE) {
   global $user;
 
-  $cache_server_enabled = !$complete && variable_get('admin_menu_cache_server', TRUE);
+  $cache_server_enabled = !$complete;
   $langcode = language(LANGUAGE_TYPE_INTERFACE)->langcode;
   $cid = 'admin_menu:' . $user->uid . ':' . session_id() . ':' . $langcode;
   $tags = array('admin_menu' => TRUE, 'user' => $user->uid, 'language' => $langcode);
@@ -466,12 +466,7 @@ function admin_menu_output($complete = FALSE) {
   // Rebuild the output.
   if (!isset($content)) {
     // Retrieve enabled components to display and make them available for others.
-    $components = variable_get('admin_menu_components', array());
-    $components += array(
-      'admin_menu.menu' => TRUE,
-      'admin_menu.icon' => TRUE,
-      'admin_menu.account' => TRUE,
-    );
+    $components = \Drupal::config('admin_menu.settings')->get('components');
     $content['#components'] = $components;
     $content['#complete'] = $complete;
 
@@ -496,7 +491,7 @@ function admin_menu_output($complete = FALSE) {
     //   implementations (and $module.admin_menu.inc).
 
     // Add administration menu.
-    if (!empty($components['admin_menu.menu']) || $complete) {
+    if (!empty($components['menu']) || $complete) {
       $content['menu'] = admin_menu_links_menu(admin_menu_tree('admin'));
       $content['menu']['#theme'] = 'admin_menu_links';
       $content['menu']['#wrapper_attributes']['id'] = 'admin-menu-menu';
@@ -505,16 +500,16 @@ function admin_menu_output($complete = FALSE) {
     }
 
     // Add menu additions.
-    if (!empty($components['admin_menu.icon']) || $complete) {
+    if (!empty($components['icon']) || $complete) {
       $content['icon'] = admin_menu_links_icon();
     }
-    if (!empty($components['admin_menu.account']) || $complete) {
+    if (!empty($components['account']) || $complete) {
       $content['account'] = admin_menu_links_account();
     }
-    if (!empty($components['admin_menu.users']) || $complete) {
+    if (!empty($components['users']) || $complete) {
       $content['users'] = admin_menu_links_users();
     }
-    if (!empty($components['admin_menu.search']) || $complete) {
+    if (!empty($components['search']) || $complete) {
       $content['search'] = admin_menu_links_search();
     }
 

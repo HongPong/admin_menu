@@ -1,0 +1,47 @@
+admin_menu.settings:
+  type: mapping
+  label: 'Admin menu settings'
+  mapping:
+    components:
+      type: mapping
+      label: 'Admin menu components'
+      mapping:
+        icon:
+          type: boolean
+          label: 'Icon menu'
+        menu:
+          type: boolean
+          label: 'Administration menu'
+        search:
+          type: boolean
+          label: 'Search bar'
+        users:
+          type: boolean
+          label: 'User counts'
+        account:
+          type: boolean
+          label: 'Account links'
+    tweak_tabs:
+      type: boolean
+      label: 'Move local tasks into menu'
+    position_fixed:
+      type: boolean
+      label: 'Keep menu at top of page'
+    cache_client:
+      type: boolean
+      label: 'Cache menu in client-side browser'
+    margin_top:
+      type: boolean
+      label: 'Adjust top margin'
+    tweak_modules:
+      type: boolean
+      label: 'Collapse module groups on the modules admin page'
+    tweak_permissions:
+      type: boolean
+      label: 'Collapse module groups on the permissions admin page'
+    display:
+      type: boolean
+      label: 'Display additional data for each menu item'
+    show_all:
+      type: boolean
+      label: 'Display all menu items'

@@ -129,8 +129,8 @@ function hook_admin_menu_replacements($complete) {
   // current counts already.
   if (!$complete) {
     // Check whether the users count component is enabled.
-    $components = variable_get('admin_menu_components', array());
-    if (!empty($components['admin_menu.users']) && ($user_count = admin_menu_get_user_count())) {
+    $components = \Drupal::config('admin_menu.settings')->get('components');
+    if (!empty($components['users']) && ($user_count = admin_menu_get_user_count())) {
       // Replace the counters in the cached menu output with current counts.
       $items['.admin-menu-users a'] = $user_count;
     }

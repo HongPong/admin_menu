@@ -1,0 +1,7 @@
+position_fixed: true
+cache_client: true
+margin_top: true
+components:
+  icon: true
+  menu: true
+  account: true
